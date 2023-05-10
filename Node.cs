@@ -187,7 +187,9 @@ namespace ThreadSynchronization
         public Thread Start()
         {
             //your code here
-            return null;
+            Thread t = new Thread(Run);
+            t.Start();
+            return t;
         }
 
         //prints the routing table 
@@ -237,7 +239,12 @@ namespace ThreadSynchronization
         public bool SendMessage(string sMessage, int iMessageID, int iTarget)
         {
             //your code here
-            return false;
+            if (!m_dNeighbors.ContainsKey(iTarget)) return false;
+            for (int i = 0; i < sMessage.Length; i++) {
+                PacketMessage pmsg = new PacketMessage(ID, iTarget, iMessageID, sMessage[i], i, sMessage.Length);
+                m_dNeighbors[iTarget].Send(pmsg);
+            }
+            return true;
         }
     }
 }
