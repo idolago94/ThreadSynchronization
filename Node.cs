@@ -104,7 +104,26 @@ namespace ThreadSynchronization
             else
             {
                 //your code here - forward the message to a neighbor using the routing table
-                throw new NotImplementedException();
+                if (!m_dMessages.ContainsKey(pmsg.MessageID))
+                {
+                    m_dMessages[pmsg.MessageID] = new char[pmsg.Size];
+                    for (int i = 0; i < pmsg.Size; i++)
+                        m_dMessages[pmsg.MessageID][i] = '\0';
+                }
+                m_dMessages[pmsg.MessageID][pmsg.Location] = pmsg.Packet;
+                bool bDone = true;
+                foreach (char c in m_dMessages[pmsg.MessageID])
+                {
+                    if (c == '\0')
+                        bDone = false;
+                }
+                if (bDone)
+                {
+                    string sMsg = "";
+                    foreach (char c in m_dMessages[pmsg.MessageID])
+                        sMsg += c;
+                    SendMessage(sMsg, pmsg.MessageID, GetRouter(pmsg.Target));
+                }
             }
         }
 
