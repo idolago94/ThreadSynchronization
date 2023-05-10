@@ -13,15 +13,18 @@ namespace ThreadSynchronization
     class SynchronizedMailBox : MailBox
     {
         private Mutex mu = new Mutex();
+        private Semaphore se = new Semaphore(0);
 
         public virtual void Write(Message msg)
         {
             mu.Lock();
             base.Write(msg);
             mu.Unlock();
+            se.Up();
         }
         public virtual Message Read()
         {
+            if (base.IsEmpty()) se.Down();
             mu.Lock();
             Message msg = base.Read();
             mu.Unlock();
