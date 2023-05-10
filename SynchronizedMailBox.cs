@@ -12,6 +12,20 @@ namespace ThreadSynchronization
     //You can, however, add any other fields as you see fit.
     class SynchronizedMailBox : MailBox
     {
-        //your code here
+        private Mutex mu = new Mutex();
+
+        public virtual void Write(Message msg)
+        {
+            mu.Lock();
+            base.Write(msg);
+            mu.Unlock();
+        }
+        public virtual Message Read()
+        {
+            mu.Lock();
+            Message msg = base.Read();
+            mu.Unlock();
+            return msg;
+        }
     }
 }
