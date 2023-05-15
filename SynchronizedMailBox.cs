@@ -15,14 +15,14 @@ namespace ThreadSynchronization
         private Mutex mu = new Mutex();
         private Semaphore se = new Semaphore(0);
 
-        public virtual void Write(Message msg)
+        public override void Write(Message msg)
         {
             mu.Lock();
             base.Write(msg);
             mu.Unlock();
             se.Up();
         }
-        public virtual Message Read()
+        public override Message Read()
         {
             if (base.IsEmpty()) se.Down();
             mu.Lock();

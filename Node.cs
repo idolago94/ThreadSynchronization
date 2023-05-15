@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -239,7 +239,7 @@ namespace ThreadSynchronization
         public bool SendMessage(string sMessage, int iMessageID, int iTarget)
         {
             //your code here
-            if (!m_dNeighbors.ContainsKey(iTarget)) return false;
+            if (iTarget == -1 || !m_dNeighbors.ContainsKey(iTarget)) return false;
             for (int i = 0; i < sMessage.Length; i++) {
                 PacketMessage pmsg = new PacketMessage(ID, iTarget, iMessageID, sMessage[i], i, sMessage.Length);
                 m_dNeighbors[iTarget].Send(pmsg);
