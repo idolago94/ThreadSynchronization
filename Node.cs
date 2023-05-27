@@ -18,9 +18,9 @@ namespace ThreadSynchronization
         private Dictionary<int, int> m_dRoutingInfo; //routing information
         private Dictionary<int, char[]> m_dMessages; //received messages for this node
 
-
         public int ID { get; private set; } //the identifier of the node
 
+        private Mutex mu = new Mutex();
         public Node( int iID )
         {
             ID = iID;
@@ -78,6 +78,7 @@ namespace ThreadSynchronization
         //the message can be directed to the current node or to another node, in which case it should be forwarded
         private void HandlePacketMessage(PacketMessage pmsg)
         {
+            mu.Lock();
             if (pmsg.Target == ID)
             {
                 if (!m_dMessages.ContainsKey(pmsg.MessageID))
@@ -122,9 +123,11 @@ namespace ThreadSynchronization
                     string sMsg = "";
                     foreach (char c in m_dMessages[pmsg.MessageID])
                         sMsg += c;
+                    m_dMessages.Remove(pmsg.MessageID);
                     SendMessage(sMsg, pmsg.MessageID, GetRouter(pmsg.Target));
                 }
             }
+            mu.Unlock();
         }
 
 
@@ -239,12 +242,15 @@ namespace ThreadSynchronization
         public bool SendMessage(string sMessage, int iMessageID, int iTarget)
         {
             //your code here
-            if (iTarget == -1 || !m_dNeighbors.ContainsKey(iTarget)) return false;
-            for (int i = 0; i < sMessage.Length; i++) {
-                PacketMessage pmsg = new PacketMessage(ID, iTarget, iMessageID, sMessage[i], i, sMessage.Length);
-                m_dNeighbors[iTarget].Send(pmsg);
+            if (iTarget == -1 || !m_dNeighbors.ContainsKey(iTarget)) {
+                return false;
+            } else {
+                for (int i = 0; i < sMessage.Length; i++) {
+                    PacketMessage pmsg = new PacketMessage(ID, iTarget, iMessageID, sMessage[i], i, sMessage.Length);
+                    m_dNeighbors[iTarget].Send(pmsg);
+                }
+                return true;
             }
-            return true;
         }
     }
 }
